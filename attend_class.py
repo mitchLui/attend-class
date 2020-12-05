@@ -29,6 +29,17 @@ class Take_attendance:
             raise FileExistsError("File does not exist.")
 
     def check_class(self, cl: str) -> str:
+        """Checks if the given class is available
+
+        Args:
+            cl (str): class string
+
+        Raises:
+            ValueError: if a class is unavailable
+
+        Returns:
+            str: the class itself
+        """
         classes = ["ca", "ifp"]
         if cl in classes:
             return cl
@@ -36,12 +47,19 @@ class Take_attendance:
             raise ValueError(f"Not a valid class. Choose: {','.join(classes)}")
 
     def read_env(self) -> tuple:
+        """Reads .env file and returns username and password
+
+        Returns:
+            tuple: Blackboard username and password
+        """
         load_dotenv(verbose=True)
         BLACKBOARD_USERNAME = os.getenv("BLACKBOARD_USERNAME")
         BLACKBOARD_PASSWORD = os.getenv("BLACKBOARD_PASSWORD")
         return BLACKBOARD_USERNAME, BLACKBOARD_PASSWORD
 
     def login_blackboard(self) -> None:
+        """Logs into blackboard
+        """
         logger.info("Signing into blackboard...")
         blackboard_login_url = self.config["login"]
         self.driver.get(blackboard_login_url)
@@ -52,11 +70,15 @@ class Take_attendance:
         self.driver.find_element_by_id("submit").click()
 
     def open_attendence_page(self) -> None:
+        """Opens attendance page
+        """
         logger.info(f"Opening attendance page for {self.cls}...")
         url = f"{self.config['url']}/{self.config['classes'][self.cls]}"
         self.driver.get(url)
 
     def take_attendance(self) -> None:
+        """Enters information and check into classes
+        """
         try:
             logger.info("Logging attendance...")
             if self.pin:
@@ -71,6 +93,8 @@ class Take_attendance:
             logger.info("Program run complete.")
 
     def attend_class(self) -> None:
+        """Main function
+        """
         self.login_blackboard()
         time.sleep(5)
         self.open_attendence_page()
