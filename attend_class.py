@@ -29,8 +29,7 @@ class Take_attendance:
         load_dotenv(verbose=True)
         BLACKBOARD_USERNAME = os.getenv("BLACKBOARD_USERNAME")
         BLACKBOARD_PASSWORD = os.getenv("BLACKBOARD_PASSWORD")
-        BROWSER = os.getenv("BROWSER")
-        return BLACKBOARD_USERNAME, BLACKBOARD_PASSWORD, BROWSER
+        return BLACKBOARD_USERNAME, BLACKBOARD_PASSWORD
 
     def login_blackboard(self):
         logger.info("Signing into blackboard...")
