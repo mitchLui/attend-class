@@ -58,8 +58,7 @@ class Take_attendance:
         return BLACKBOARD_USERNAME, BLACKBOARD_PASSWORD
 
     def login_blackboard(self) -> None:
-        """Logs into blackboard
-        """
+        """Logs into blackboard"""
         logger.info("Signing into blackboard...")
         blackboard_login_url = self.config["login"]
         self.driver.get(blackboard_login_url)
@@ -70,15 +69,13 @@ class Take_attendance:
         self.driver.find_element_by_id("submit").click()
 
     def open_attendence_page(self) -> None:
-        """Opens attendance page
-        """
+        """Opens attendance page"""
         logger.info(f"Opening attendance page for {self.cls}...")
         url = f"{self.config['url']}/{self.config['classes'][self.cls]}"
         self.driver.get(url)
 
     def take_attendance(self) -> None:
-        """Enters information and check into classes
-        """
+        """Enters information and check into classes"""
         try:
             logger.info("Logging attendance...")
             if self.pin:
@@ -93,8 +90,7 @@ class Take_attendance:
             logger.info("Program run complete.")
 
     def attend_class(self) -> None:
-        """Main function
-        """
+        """Main function"""
         self.login_blackboard()
         time.sleep(5)
         self.open_attendence_page()
