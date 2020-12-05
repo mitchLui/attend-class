@@ -3,37 +3,47 @@ from loguru import logger
 from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
 from dotenv import load_dotenv
+import json
 import time
 import sys
 import os
 
 
 class Take_attendance:
-    def __init__(self, cls: str, pin=None):
+    def __init__(self, cls: str, pin=None) -> None:
         self.pin = pin
         self.cls = self.check_class(cls)
-        self.bb_username, self.bb_password, browser = self.read_env()
+        self.bb_username, self.bb_password = self.read_env()
         # * Choose: webdriver.Safari(), webdriver.Chrome(), webdriver.Firefox()
         self.driver = webdriver.Safari()
-        self.blackboard_url = "https://www.ole.bris.ac.uk"
-        logger.debug(f"CLASS: {self.cls}, PIN: {self.pin}")
+        self.config = self.load_config()
+        logger.info(f"CLASS: {self.cls}, PIN: {self.pin}")
 
-    def check_class(self, cl: str):
+    def load_config(self, filename="config.json") -> dict:
+        if os.path.isfile(filename):
+            with open(filename) as f:
+                data = json.load(f)
+            logger.info("Config loaded")
+            return data
+        else:
+            raise FileExistsError("File does not exist.")
+
+    def check_class(self, cl: str) -> str:
         classes = ["ca", "ifp"]
         if cl in classes:
             return cl
         else:
             raise ValueError(f"Not a valid class. Choose: {','.join(classes)}")
 
-    def read_env(self):
+    def read_env(self) -> tuple:
         load_dotenv(verbose=True)
         BLACKBOARD_USERNAME = os.getenv("BLACKBOARD_USERNAME")
         BLACKBOARD_PASSWORD = os.getenv("BLACKBOARD_PASSWORD")
         return BLACKBOARD_USERNAME, BLACKBOARD_PASSWORD
 
-    def login_blackboard(self):
+    def login_blackboard(self) -> None:
         logger.info("Signing into blackboard...")
-        blackboard_login_url = "https://sso.bris.ac.uk/sso/login?service=https%3A%2F%2Fwww.ole.bris.ac.uk%2Fwebapps%2Fbb-auth-provider-cas-bb_bb60%2Fexecute%2FcasLogin%3Fcmd%3Dlogin%26authProviderId%3D_122_1%26redirectUrl%3Dhttps%253A%252F%252Fwww.ole.bris.ac.uk%26globalLogoutEnabled%3Dtrue"
+        blackboard_login_url = self.config["login"]
         self.driver.get(blackboard_login_url)
         time.sleep(2)
         login_info = {"username": self.bb_username, "password": self.bb_password}
@@ -41,16 +51,12 @@ class Take_attendance:
             self.driver.find_element_by_id(key).send_keys(value)
         self.driver.find_element_by_id("submit").click()
 
-    def open_attendence_page(self):
+    def open_attendence_page(self) -> None:
         logger.info(f"Opening attendance page for {self.cls}...")
-        if self.cls == "ca":
-            attendance_uri = "webapps/blackboard/execute/blti/launchPlacement?blti_placement_id=_220_1&content_id=_4919923_1&course_id=_240775_1"
-        else:
-            attendance_uri = "webapps/blackboard/execute/blti/launchPlacement?blti_placement_id=_220_1&content_id=_4919929_1&course_id=_240776_1"
-        url = f"{self.blackboard_url}/{attendance_uri}"
+        url = f"{self.config['url']}/{self.config['classes'][self.cls]}"
         self.driver.get(url)
 
-    def take_attendance(self):
+    def take_attendance(self) -> None:
         try:
             logger.info("Logging attendance...")
             if self.pin:
@@ -64,7 +70,7 @@ class Take_attendance:
         finally:
             logger.info("Program run complete.")
 
-    def attend_class(self):
+    def attend_class(self) -> None:
         self.login_blackboard()
         time.sleep(5)
         self.open_attendence_page()
