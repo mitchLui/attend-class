@@ -1,0 +1,8 @@
+{
+    "login": "https://sso.bris.ac.uk/sso/login?service=https%3A%2F%2Fwww.ole.bris.ac.uk%2Fwebapps%2Fbb-auth-provider-cas-bb_bb60%2Fexecute%2FcasLogin%3Fcmd%3Dlogin%26authProviderId%3D_122_1%26redirectUrl%3Dhttps%253A%252F%252Fwww.ole.bris.ac.uk%26globalLogoutEnabled%3Dtrue",
+    "url": "https://www.ole.bris.ac.uk",
+    "classes": {
+        "ca": "webapps/blackboard/execute/blti/launchPlacement?blti_placement_id=_220_1&content_id=_4919923_1&course_id=_240775_1",
+        "ifp": "webapps/blackboard/execute/blti/launchPlacement?blti_placement_id=_220_1&content_id=_4919929_1&course_id=_240776_1"
+    }
+}
