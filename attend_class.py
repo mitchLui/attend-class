@@ -8,14 +8,18 @@ import time
 import sys
 import os
 
+
 class Take_attendance:
     def __init__(self, cls: str, pin=None) -> None:
         self.pin = pin
         self.cls = self.check_class(cls)
         self.bb_username, self.bb_password = self.read_env()
-        if platform.system() == "Darwin": self.driver = webdriver.Safari()
-        elif platform.system() == "Windows": self.driver = webdriver.Edge()
-        else: self.driver = webdriver.Firefox()
+        if platform.system() == "Darwin":
+            self.driver = webdriver.Safari()
+        elif platform.system() == "Windows":
+            self.driver = webdriver.Edge()
+        else:
+            self.driver = webdriver.Firefox()
         self.config = self.load_config()
         logger.info(f"CLASS: {self.cls}, PIN: {self.pin}")
 
