@@ -4,9 +4,9 @@ A python script that logs onto the University of Bristol Blackboard website and 
 
 ## Requirements
 
-Check `requirements.txt` for library requirements
+Check `requirements.txt` for dependencies
 
-Install requirements:
+Install dependencies:
 
 ```sh
 pip3 install -r requirements.txt
@@ -25,19 +25,19 @@ You also need a `.env` file containing your credentials. See `.env.sample` for t
 ## Usage
 
 ```sh
-python3 take_attendance.py <code> <pin>
+python3 take_attendance.py 
 ```
 
 Examples:
 
-1. Attend Computer Architecture
+1. Attend Computer Architecture (coms10015)
 
 ```sh
-python3 take_attendance.py "ca" 
+python3 take_attendance.py --unit coms10015
 ```
 
 2. Attend IFP
 
-```shs
-python3 take_attendance.py "ifp" 8149
+```sh
+python3 take_attendance.py --unit coms10015 --pin 8768
 ```
