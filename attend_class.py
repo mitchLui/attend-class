@@ -1,28 +1,17 @@
 # -*- coding: utf-8 -*-
 from loguru import logger
-from selenium import webdriver
 from dotenv import load_dotenv
+from traceback import format_exc
+import pyppeteer
 import argparse
-import platform
+import asyncio
 import json
-import time
-import sys
 import os
 
 
 class Attend_class:
-    def __init__(self, unit: str, pin=None) -> None:
-        self.pin = pin
+    def __init__(self) -> None:
         self.config = self.load_config()
-        self.unit = self.check_class(unit)
-        self.bb_username, self.bb_password = self.read_env()
-        if platform.system() == "Darwin":
-            self.driver = webdriver.Safari()
-        elif platform.system() == "Windows":
-            self.driver = webdriver.Edge()
-        else:
-            self.driver = webdriver.Firefox()
-        logger.info(f"CLASS: {self.unit}, PIN: {self.pin}")
 
     def load_config(self, filename="config.json") -> dict:
         if os.path.isfile(filename):
@@ -33,23 +22,23 @@ class Attend_class:
         else:
             raise FileExistsError("File does not exist.")
 
-    def check_class(self, cl: str) -> str:
-        """Checks if the given class is available
+    def check_unit(self, unit: str) -> str:
+        """Checks if the given unit is available
 
         Args:
-            cl (str): class string
+            unit (str): unit string
 
         Raises:
-            ValueError: if a class is unavailable
+            ValueError: if a unit is unavailable
 
         Returns:
-            str: the class itself
+            str: the unit itself
         """
-        classes = list(self.config["classes"].keys())
-        if cl in classes:
-            return cl
+        units = list(self.config["units"].keys())
+        if unit in units:
+            return unit
         else:
-            raise ValueError(f"Not a valid class. Choose: {','.join(classes)}")
+            raise ValueError(f"Not a valid class. Choose: {','.join(units)}")
 
     def read_env(self) -> tuple:
         """Reads .env file and returns username and password
@@ -62,30 +51,37 @@ class Attend_class:
         BLACKBOARD_PASSWORD = os.getenv("BLACKBOARD_PASSWORD")
         return BLACKBOARD_USERNAME, BLACKBOARD_PASSWORD
 
-    def login_blackboard(self) -> None:
+    async def login_blackboard(
+        self, page: pyppeteer.page.Page, username: str, password: str
+    ) -> None:
         """Logs into blackboard"""
         logger.info("Signing into blackboard...")
         blackboard_login_url = self.config["login"]
-        self.driver.get(blackboard_login_url)
-        time.sleep(2)
-        login_info = {"username": self.bb_username, "password": self.bb_password}
+        await page.goto(blackboard_login_url)
+        login_info = {"#username": username, "#password": password}
         for key, value in login_info.items():
-            self.driver.find_element_by_id(key).send_keys(value)
-        self.driver.find_element_by_id("submit").click()
+            await page.click(key)
+            await page.keyboard.type(value)
+        await page.click("#submit")
 
-    def open_attendence_page(self) -> None:
+    async def open_attendence_page(self, page: pyppeteer.page.Page, unit: str) -> None:
         """Opens attendance page"""
-        logger.info(f"Opening attendance page for {self.unit}...")
-        url = f"{self.config['url']}/{self.config['classes'][self.unit]}"
-        self.driver.get(url)
+        logger.info(f"Opening attendance page for {unit}...")
+        url = f"{self.config['url']}/{self.config['units'][unit]}"
+        await page.goto(url)
 
-    def take_attendance(self) -> None:
+    async def take_attendance(self, page: pyppeteer.page.Page, pin: str) -> None:
         """Enters information and check into classes"""
         try:
             logger.info("Logging attendance...")
-            if self.pin:
-                self.driver.find_element_by_id("check_in_pin").send_keys(self.pin)
-            self.driver.find_element_by_id("student_check_in").click()
+            if pin:
+                await page.evaluate(
+                    f"()=>{{docuemnt.getElementById('#check_in_pin').click()}}"
+                )
+                await page.keyboard.type(pin)
+            await page.evaluate(
+                f"()=>{{docuemnt.getElementById('#student_check_in').click()}}"
+            )
         except Exception as e:
             logger.error(
                 "Attendance either not available or you have already checked in."
@@ -94,24 +90,33 @@ class Attend_class:
         finally:
             logger.info("Program run complete.")
 
-    def attend_class(self) -> None:
+    async def attend_class(self, unit: str, pin: str = None, headless: bool = False) -> None:
         """Main function"""
-        self.login_blackboard()
-        time.sleep(5)
-        self.open_attendence_page()
-        time.sleep(6)
-        self.take_attendance()
-        self.driver.quit()
+        browser = await pyppeteer.launch(headless = headless)
+        try:
+            page = await browser.newPage()
+            username, password = self.read_env()
+            unit = self.check_unit(unit)
+            logger.info(f"UNIT: {unit}, PIN: {pin}")
+            await self.login_blackboard(page, username, password)
+            await page.waitForNavigation({"waitUntil": "networkidle0"})
+            await self.open_attendence_page(page, unit)
+            await page.waitForNavigation({"waitUntil": "networkidle0"})
+            await self.take_attendance(page, pin)
+        except Exception:
+            logger.error(format_exc())
+        finally:
+            await browser.close()
 
 
 def main():
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("--unit", action="store", default="coms10015")
     parser.add_argument("--pin", action="store", type=str, default=None)
+    parser.add_argument("--headless", action="store_true")
     argv = parser.parse_args()
-    ac = Attend_class(argv.unit, argv.pin)
-    ac.attend_class()
-
+    ac = Attend_class()
+    asyncio.get_event_loop().run_until_complete(ac.attend_class(argv.unit, argv.pin, argv.headless))
 
 if __name__ == "__main__":
     main()
