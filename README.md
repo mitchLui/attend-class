@@ -24,9 +24,18 @@ You also need a `.env` file containing your credentials. See `.env.sample` for t
 
 ## Usage
 
+Example
+
 ```sh
-python3 take_attendance.py --unit <code> --pin <pin>
+python3 take_attendance.py --unit <code> --pin <pin> --headless
 ```
+
+options:
+
+- `--unit` (compulsory ): unit number
+- `--pin` (optional, defaults to None): class pin
+- `--headless` (optional, defaults to False): whether to run in headless mode (Do not show browser while running)
+
 
 Examples:
 
