@@ -16,10 +16,10 @@ You also need a `.env` file containing your credentials. See `.env.sample` for t
 
 ## Available Classes
 
-| Class                               | Code   | Remarks    |
-| ----------------------------------- | ------ | ---------- |
-| Computer Architecture               | "ca"   | N/A        |
-| Imperative & Functional Programming | "ifp"  | pin needed |
+| Class                               | Code          | Remarks    |
+| ----------------------------------- | ------------- | ---------- |
+| Computer Architecture               | "coms10015"   | N/A        |
+| Imperative & Functional Programming | "coms10016"   | pin needed |
 
 
 ## Usage

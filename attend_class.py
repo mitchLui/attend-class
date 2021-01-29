@@ -44,7 +44,7 @@ class Take_attendance:
         Returns:
             str: the class itself
         """
-        classes = ["ca", "ifp"]
+        classes = list(self.config["classes"].keys())
         if cl in classes:
             return cl
         else:
