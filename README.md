@@ -14,7 +14,7 @@ pip3 install -r requirements.txt
 
 You also need a `.env` file containing your credentials. See `.env.sample` for template.
 
-## Available Classes
+## Available Units
 
 | Class                               | Code          | Remarks    |
 | ----------------------------------- | ------------- | ---------- |
@@ -25,7 +25,7 @@ You also need a `.env` file containing your credentials. See `.env.sample` for t
 ## Usage
 
 ```sh
-python3 take_attendance.py 
+python3 take_attendance.py --unit <code> --pin <pin>
 ```
 
 Examples:
