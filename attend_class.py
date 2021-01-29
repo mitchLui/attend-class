@@ -2,6 +2,7 @@
 from loguru import logger
 from selenium import webdriver
 from dotenv import load_dotenv
+import argparse
 import platform
 import json
 import time
@@ -9,10 +10,11 @@ import sys
 import os
 
 
-class Take_attendance:
-    def __init__(self, cls: str, pin=None) -> None:
+class Attend_class:
+    def __init__(self, unit: str, pin=None) -> None:
         self.pin = pin
-        self.cls = self.check_class(cls)
+        self.config = self.load_config()
+        self.unit = self.check_class(unit)
         self.bb_username, self.bb_password = self.read_env()
         if platform.system() == "Darwin":
             self.driver = webdriver.Safari()
@@ -20,8 +22,7 @@ class Take_attendance:
             self.driver = webdriver.Edge()
         else:
             self.driver = webdriver.Firefox()
-        self.config = self.load_config()
-        logger.info(f"CLASS: {self.cls}, PIN: {self.pin}")
+        logger.info(f"CLASS: {self.unit}, PIN: {self.pin}")
 
     def load_config(self, filename="config.json") -> dict:
         if os.path.isfile(filename):
@@ -44,7 +45,7 @@ class Take_attendance:
         Returns:
             str: the class itself
         """
-        classes = ["ca", "ifp"]
+        classes = list(self.config["classes"].keys())
         if cl in classes:
             return cl
         else:
@@ -74,8 +75,8 @@ class Take_attendance:
 
     def open_attendence_page(self) -> None:
         """Opens attendance page"""
-        logger.info(f"Opening attendance page for {self.cls}...")
-        url = f"{self.config['url']}/{self.config['classes'][self.cls]}"
+        logger.info(f"Opening attendance page for {self.unit}...")
+        url = f"{self.config['url']}/{self.config['classes'][self.unit]}"
         self.driver.get(url)
 
     def take_attendance(self) -> None:
@@ -103,12 +104,14 @@ class Take_attendance:
         self.driver.quit()
 
 
+def main():
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--unit", action="store", default="coms10015")
+    parser.add_argument("--pin", action="store", type=str, default=None)
+    argv = parser.parse_args()
+    ac = Attend_class(argv.unit, argv.pin)
+    ac.attend_class()
+
+
 if __name__ == "__main__":
-    if len(sys.argv) > 3:
-        logger.error("MORE THAN 2 ARGS GIVEN")
-    else:
-        if len(sys.argv) == 3:
-            ta = Take_attendance(sys.argv[1], sys.argv[2])
-        else:
-            ta = Take_attendance(sys.argv[1])
-        ta.attend_class()
+    main()
