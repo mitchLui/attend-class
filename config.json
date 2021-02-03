@@ -3,6 +3,7 @@
     "url": "https://www.ole.bris.ac.uk",
     "units": {
         "coms10015": "webapps/blackboard/execute/blti/launchPlacement?blti_placement_id=_220_1&content_id=_4919923_1&course_id=_240775_1",
-        "coms10016": "webapps/blackboard/execute/blti/launchPlacement?blti_placement_id=_220_1&content_id=_4919929_1&course_id=_240776_1"
+        "coms10016": "webapps/blackboard/execute/blti/launchPlacement?blti_placement_id=_220_1&content_id=_4919929_1&course_id=_240776_1",
+        "coms10017": "webapps/blackboard/execute/blti/launchPlacement?blti_placement_id=_220_1&content_id=_4919935_1&course_id=_240777_1"
     }
 }
