@@ -9,7 +9,7 @@ import asyncio
 import json
 import os
 
-
+adsmfkajsd fkljsdkjfkljk
 class Attend_class:
     def __init__(self) -> None:
         self.config = self.load_config()
