@@ -20,6 +20,7 @@ You also need a `.env` file containing your credentials. See `.env.sample` for t
 | ----------------------------------- | ------------- | ---------- |
 | Computer Architecture               | "coms10015"   | N/A        |
 | Imperative & Functional Programming | "coms10016"   | pin needed |
+| OOP & Algorithms I                  | "coms10017"   | pin needed |
 
 
 ## Usage
