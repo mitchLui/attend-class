@@ -2,6 +2,7 @@
 from loguru import logger
 from dotenv import load_dotenv
 from traceback import format_exc
+from time import sleep
 import pyppeteer
 import argparse
 import asyncio
@@ -76,11 +77,11 @@ class Attend_class:
             logger.info("Logging attendance...")
             if pin:
                 await page.evaluate(
-                    f"()=>{{docuemnt.getElementById('#check_in_pin').click()}}"
+                    f"()=>{{docuemnt.getElementById('check_in_pin').click()}}"
                 )
                 await page.keyboard.type(pin)
             await page.evaluate(
-                f"()=>{{docuemnt.getElementById('#student_check_in').click()}}"
+                f"()=>{{docuemnt.getElementById('student_check_in').click()}}"
             )
         except Exception as e:
             logger.error(
@@ -102,6 +103,7 @@ class Attend_class:
             await page.waitForNavigation({"waitUntil": "networkidle0"})
             await self.open_attendence_page(page, unit)
             await page.waitForNavigation({"waitUntil": "networkidle0"})
+            sleep(5)
             await self.take_attendance(page, pin)
         except Exception:
             logger.error(format_exc())
